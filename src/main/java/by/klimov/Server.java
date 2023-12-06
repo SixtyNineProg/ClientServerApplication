@@ -8,6 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class Server {
+
   private final List<Integer> data = new CopyOnWriteArrayList<>();
   private final Random rand = new Random();
 

@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Getter
 public class Client {
+
   public static final int THREAD_POOL_SIZE = 10;
   private final ExecutorService executor;
   private final List<Integer> data;
@@ -29,7 +30,7 @@ public class Client {
     }
   }
 
-  public void execute(Server server) {
+  public boolean execute(Server server, int awaitTermination) {
     while (!data.isEmpty()) {
       int index = random.nextInt(data.size());
       int value = data.remove(index);
@@ -46,7 +47,12 @@ public class Client {
           });
     }
     executor.shutdown();
-    while (!executor.isTerminated()) {}
+    try {
+      return executor.awaitTermination(awaitTermination, TimeUnit.SECONDS);
+    } catch (InterruptedException e) {
+      Thread.currentThread().interrupt();
+      throw new ExecuteException(e);
+    }
   }
 
   public int getAccumulator() {
